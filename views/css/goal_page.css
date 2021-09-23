@@ -1,0 +1,44 @@
+:root{
+    --orange:#ff5733;
+    --yellow:#ffc300;
+    --red:#c70039;
+    --bordeau:#900c3e;
+    --purple:#571845;
+}
+
+body {
+    background-image: linear-gradient(to left, var(--orange),var(--yellow));
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+section {
+    width:1200px;
+    height:600px;
+    line-height:2.5;
+    font-size: 21pt;
+}
+
+input {
+    height:45px;
+    width:40%;
+    border-radius:8px;
+    margin-left:50%;
+    margin-top:0px;
+    font-size: 19pt;
+}
+
+#submit_button {
+    margin:auto;
+    font-size: 15pt;
+    color:var(--yellow);
+    background-color:var(--bordeau);
+    border-color:var(--bordeau);
+}
+
+#submit_button:hover {
+    color:var(--bordeau);
+    background-color:var(--yellow);
+    cursor:pointer;
+}

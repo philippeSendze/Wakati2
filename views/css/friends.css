@@ -1,0 +1,125 @@
+body {
+    display:flex;
+    justify-content: space-between;
+    border: 3px solid black;
+    height:750px;
+    padding-top: 15px;
+    margin-right: 100px;
+    margin-left: 100px;
+}
+
+#change_table {
+    border: 3px solid black;
+    width:130px;
+    height:150px;
+    text-align: center;
+    margin-top:150px;
+}
+
+#change_label {
+    font-size:14pt;
+    height: 40px;
+}
+
+#change_button {
+    border-radius:50%;
+    width: 50px;
+    height:50px;
+    background-color:cadetblue;
+    
+}
+
+#change_button:hover{
+    cursor: pointer;
+}
+
+#friends_goals {
+    border: 3px solid black;
+    flex:0.35;
+    /*margin-left: 50px;
+    margin-right: 150px;
+    margin-bottom: 40px;*/
+}
+
+#conversation {
+    border: 3px solid black;
+    flex:0.55;
+    /*margin-right: 70px;*/
+    
+}
+
+
+
+#conversation header {
+    padding-left:20px;
+    padding-bottom:10px;
+    background-color: brown;
+
+}
+
+table{
+    width:100%;
+    height:100%;
+    border-collapse: collapse;
+    overflow: auto;
+    
+}
+
+th, td {
+    padding-left:20px;
+}
+
+
+th {
+    background-color: var(--bordeau);
+    color: var(--yellow);
+    border: 3px solid var(--bordeau);
+    cursor:help;
+    font-size: 14pt;
+}
+
+td {
+    background-color: white;
+    border: 3px solid var(--purple);
+
+    
+}
+
+.all {
+    text-align:center;
+}
+
+.title_goal {
+    cursor:pointer;
+    text-align:center;
+}
+
+.title_my_goal {
+    cursor:pointer;
+    text-align:center;
+}
+
+
+h1 {
+    text-align:center;
+}
+
+label {
+    font-style: italic;
+    font-weight: bold;
+}
+
+span {
+    margin-right: 20px;
+}
+
+header {
+    text-align:center;
+}
+
+#submit_button {
+    border-radius:50%;
+    width: 50px;
+    height:50px;
+    background-color:cadetblue;
+}

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="css/home.css">
+        <title>Tableau de bord</title>
+    </head>
+    <body>
+        <header>
+           <input type="button" value="Se déconnecter" id="logout" onclick="location.href='/logout'">
+        </header>
+        <div id="main_page">
+            <div id="board">
+                <h1><%= user.name %></h1>
+                <div id="subboard">
+                    <div id="goals">
+                        <table>
+                            <thead>
+                                <th>Objectifs en cours</th>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div id="finished_goals">
+                        <table>
+                            <thead>
+                                <th>Historique des objectifs accomplis</th>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="button_section">
+                    <input type="button" onclick="location.href='/goals'" id = "add" class="button_board" value="Ajouter un objectif">
+                    <input type="button" onclick="location.href='/friends'" class="button_board" value="Objectifs d'amis">
+                </div>
+            </div>
+            <div id="papy_section">
+                <div id="iconPapy">
+                    <img src="images/3553852.gif" alt="Papy Wakati">
+                </div>
+                <div id="dialog">
+                    <p><span>Bienvenue sur ton journal d'objectifs !</span></p>
+                    <p>Partout où tu dirigeras le curseur ta souris, je te donnerai des détails pour que tu te retrouves.</p>
+                    <p>P.S: A chaque fois que tu cliqueras sur ma tête, tu auras une citation générée au hasard !</p>
+                </div>
+            </div>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                fetch('http://localhost:3000/list/goals_non_accomplished')
+                .then(response => response.json())
+                .then(data => loadTableNonAccomplished(data['data']));
+            });
+
+            document.addEventListener("DOMContentLoaded", function () {
+                fetch('http://localhost:3000/list/goals_accomplished')
+                .then(response => response.json())
+                .then(data => loadTableAccomplished(data['data']));
+            });
+
+            var deleteBtn = document.getElementsByClassName("delete");
+            var accomplishedBtn = document.getElementsByClassName("accomplished");
+            var details = document.getElementsByClassName("details");
+
+
+            function loadTableNonAccomplished(data) {
+                const table = document.querySelector('#goals table tbody');
+                if (data.length === 0) {
+                    table.innerHTML = "<tr><td class='no-data'>Pas d'objectif en cours</td></tr>";
+                    return;
+                }
+                
+                let tableHtml = "";
+
+                data.forEach(function ({id_goal, goal}) {
+                    tableHtml += "<tr>";
+                    tableHtml += `<td>
+                                    <div class="all">
+                                        <p class="title_goal">${goal}</p>
+                                        <div class="blocks">
+                                            <input class="details" type="button" data-id=${id_goal} value="Détails">
+                                            <input class="delete" type="button" data-id=${id_goal} value="Abandonner">
+                                            <input class="accomplished" type="button" data-id=${id_goal} value="Accompli">
+                                        </div>
+                                    </div>
+                                </td>`;
+                    tableHtml += "</tr>";
+                });
+
+                table.innerHTML = tableHtml;
+                
+                for(let i=0; i<deleteBtn.length; i++){
+                    deleteBtn[i].addEventListener('click', function () {
+                        let value=deleteBtn[i].dataset.id;
+                        deleteById(value);
+                        
+                });}
+
+                for(let i=0; i<accomplishedBtn.length; i++){
+                    accomplishedBtn[i].addEventListener('click', function () {
+                        let value=accomplishedBtn[i].dataset.id;
+                        updateAccomplished(value);
+                        
+                });}
+
+
+                
+            }
+
+
+            function loadTableAccomplished(data) {
+                const table = document.querySelector('#finished_goals table tbody');
+                if (data.length === 0) {
+                    table.innerHTML = "<tr><td class='no-data'>Pas d'objectif accompli</td></tr>";
+                    return;
+                }
+                
+                let tableHtml = "";
+
+                data.forEach(function ({id_goal,goal}) {
+                    tableHtml += "<tr>";
+                    tableHtml += `<td>
+                                    <div class="all">
+                                        <p class="title_goal">${goal}</p>
+                                        <div class="blocks">
+                                            <input class="details" type="button" data-id=${id_goal} value="Détails">
+                                            <input class="delete" type="button" data-id=${id_goal} value="Supprimer">
+                                        </div>
+                                    </div>
+                                </td>`;
+                    tableHtml += "</tr>";
+                });
+                
+                table.innerHTML = tableHtml;
+
+                for(let i=0; i<deleteBtn.length; i++){
+                    deleteBtn[i].addEventListener('click', function () {
+                        let value=deleteBtn[i].dataset.id;
+                        deleteById(value);
+                        
+                });} 
+
+                for(let i=0; i<details.length; i++){
+                    details[i].addEventListener('click', function () {
+                        let value=details[i].dataset.id;
+                        getOneGoal(value);
+                        
+                });}
+                    
+            }
+
+
+            function deleteById(id) {
+                fetch('http://localhost:3000/delete/' + id, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                });
+            }
+
+            function updateAccomplished(id) {
+                fetch('http://localhost:3000/update/accomplished/' + id, {
+                    method: 'PATCH'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                }); 
+            }
+
+            function getOneGoal (id) {
+                fetch('http://localhost:3000/goals/' + id, {
+                    method: 'GET'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`
+                            Objectif : ${data.success[0].goal} ;
+                            Date d'échéance : ${new Date(data.success[0].date_goal).toLocaleDateString()} ;
+                            Partenaire : ${data.success[0].partner} ;
+                            Son email : ${data.success[0].email_partner}.
+                            `);
+                    }
+                });
+            }
+
+
+            const table_goals_non_accomplished = document.getElementById("goals");
+            const table_goals_accomplished = document.getElementById("finished_goals");
+            const addBtn = document.getElementById("add");
+            const dialog = document.getElementById("dialog");
+            const papy = document.querySelector("#iconPapy img");
+            const logout = document.getElementById("logout");
+
+
+
+            addBtn.addEventListener("mouseover", function () {
+                dialog.innerHTML=`<p>Grâce à ce bouton, tu peux enregistrer un <span>objectif</span>, son <span>échéance</span> et une <span>connaissance</span> à toi qui te rappellera continuellement de le réussir.</p>`;
+                dialog.innerHTML+='<p>J\'enverrai un mail à ton partenaire l\'informant que tu l\'as choisi afin de veiller sur la réussite de ton objectif. </p>';
+                dialog.innerHTML+='<p>Je te souhaite beaucoup de courage ! </p>';
+                
+            });
+
+            table_goals_accomplished.addEventListener("mouseover", function () {
+                dialog.innerHTML=`<p>Voici la liste de tes objectifs <span>accomplis</span> !</p>`;
+                dialog.innerHTML+='<p>Tu peux cliquer dessus pour voir les détails de chacun de ces objectifs accomplis.</p>';
+                dialog.innerHTML+='<p>Je te souhaite beaucoup de courage ! Remplir cette liste te montre qu\'il est bien possible de progresser.</p>';
+            });
+
+            table_goals_non_accomplished.addEventListener("mouseover", function () {
+                dialog.innerHTML=`<p>Voici la liste de tes objectifs <span>en cours</span>!</p>`;
+                dialog.innerHTML+='<p>Tu peux cliquer dessus pour voir les détails de chacun de tes objectifs.</p>';
+                dialog.innerHTML+='<p><span>Courage</span> ! <span>Courage</span> ! <span>Persévérance</span> ! Quand tu auras mon âge, il ne faudra rien regretter !</p>';
+                
+            });
+
+            logout.addEventListener("mouseover", function () {
+                dialog.innerHTML=`<p><span>À la prochaine !</span></p>`;
+                dialog.innerHTML+='<p>Ne te relâche pas dans ce que tu dois faire !</p>';
+            });
+
+
+            papy.addEventListener("click", function () {
+                fetch('http://localhost:3000/list/citations')
+                .then(response => response.json())
+                .then(data =>showCitationsDialog(data['data']));
+            });
+
+
+            function showCitationsDialog (data){
+                    var i=Math.floor(Math.random() * data.length) + 1;
+                    dialog.innerHTML=`<p class="citation"><i>\"${data[i].citation}\"</i></p>`;
+                    dialog.innerHTML+=`<p class="citation"> - <span>${data[i].author}</span></p>`;
+            }
+
+            addBtn.addEventListener("mouseleave", welcomeMessage);
+            table_goals_accomplished.addEventListener("mouseleave", welcomeMessage);
+            table_goals_non_accomplished.addEventListener("mouseleave", welcomeMessage);
+            papy.addEventListener("mouseleave", welcomeMessage);
+            logout.addEventListener("mouseleave", welcomeMessage);
+
+
+                
+            function welcomeMessage() {
+                dialog.innerHTML=`<p><span>Bienvenue sur ton journal d'objectifs !</span></p>`;
+                dialog.innerHTML+='<p>Partout où tu dirigeras le curseur ta souris, je te donnerai des détails pour que tu te retrouves.</p>';
+                dialog.innerHTML+='<p>P.S: A chaque fois que tu cliqueras sur ma tête, tu auras une citation générée au hasard !</p>';
+            }
+
+            function signOut() {
+                        var auth2 = gapi.auth2.getAuthInstance();
+                        auth2.signOut().then(function () {
+                        console.log('User signed out.');
+                        });
+                    }
+        </script>
+    </body>
+</html>

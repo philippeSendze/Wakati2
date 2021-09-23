@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="css/goal_page.css">
+        <title>Enregistrer un objectif</title>
+    </head>
+    <body>
+        <section>
+            <form id="save_goal" action="http://localhost:3000/goals" method="POST">
+                <label for="goal">Objectif :</label>
+                <input type="text" id="goal" name="goal" required><br>
+                <label for="date">Date d'accomplissement au plus tard :</label>
+                <input type="date" id="date_goal" name="date_goal" required><br>
+                <label for="partner">Choisir une personne à qui rendre des comptes :</label>
+                <input type="text" id="partner" name="partner" required><br>
+                <label for="email_partner">Son adresse mail :</label>
+                <input type="email" id="email_partner" name="email_partner" required><br><br>
+                <input type="submit" id="submit_button" value="Enregistrer l'objectif">
+            </form>
+        </section>
+    </body>
+</html>
