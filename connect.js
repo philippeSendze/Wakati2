@@ -105,11 +105,11 @@ class Connect {
         }
         }
 
-    async insertNewGoal(email_user,goal,date_goal,partner,email_partner) {
+    async insertNewGoal(email_user, name_user, goal,date_goal,partner,email_partner) {
         try {
             const insertId = await new Promise((resolve, reject) => {
-                var sql_query = `INSERT INTO goals (email_user, goal, date_goal, partner, email_partner) VALUES (?, ?, ?, ?, ?)`;        
-                connection.query(sql_query, [email_user,goal,date_goal,partner,email_partner], function (err, result) {
+                var sql_query = `INSERT INTO goals (email_user, name_user, goal, date_goal, partner, email_partner) VALUES (?, ?, ?, ?, ?, ?)`;        
+                connection.query(sql_query, [email_user, name_user, goal,date_goal,partner,email_partner], function (err, result) {
                     if (err) reject(new Error(err.message));
                     resolve(result.insertId); 
                 });
@@ -117,6 +117,7 @@ class Connect {
             return {
                 id_goal : insertId,
                 email_user : email_user,
+                name_user : name_user,
                 goal : goal,
                 date_goal : date_goal,
                 partner : partner,
@@ -156,8 +157,41 @@ class Connect {
     } catch (error) {
         console.log(error);
     }
-    
 
+    async sendMessage (id_goal, user, message) {
+        try {
+            const insertId = await new Promise((resolve, reject) => {
+                var sql_query = `INSERT INTO messages (id_goal, user, message) VALUES (?,?,?)`;        
+                connection.query(sql_query, [id_goal,user,message], function (err, result) {
+                    if (err) reject(new Error(err.message));
+                    resolve(result.insertId); 
+                });
+            });
+            return {
+                id : insertId,
+                id_goal : id_goal,
+                user : user,
+                message : message
+            };
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async getMessages (id_goal) {
+        const response = await new Promise((resolve, reject) => {
+            const query = "SELECT user, message FROM messages WHERE id_goal = ?";
+            connection.query(query, [id_goal], (err, results) => {
+                if (err) reject(new Error(err.message));
+                resolve(results);
+            });
+        });
+        // console.log(response);
+        return response;
+    } catch (error) {
+        console.log("Problème au niveau de l'affichage des messages"+error);
+        }
+    
     } 
     
 

@@ -6,6 +6,8 @@ const port = 3000;
 var bodyParser = require('body-parser');
 var nodemailer = require('nodemailer');
 const cookieParser = require('cookie-parser');
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 
 // Google Auth
 const {OAuth2Client} = require('google-auth-library');
@@ -26,7 +28,6 @@ function checkAuthenticated(req, res, next){
         user.name = payload.name;
         user.email = payload.email;
         user.picture = payload.picture;
-        ;
       }
       verify()
       .then(()=>{
@@ -57,6 +58,11 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extented:true}));
 app.options('*',cors());
 
+
+app.get('/whoIsLogged', checkAuthenticated, function(req,res) {
+    const user = req.user;
+    return res.json({data : user});
+});
 
 app.get('/', function(req, res){
     if(req.cookies['session-token']) return res.redirect('/home');
@@ -98,20 +104,21 @@ app.get('/goals', checkAuthenticated, function(req, res){
 
 app.post('/goals', checkAuthenticated, (req, res) => {
     var email_user = req.user.email;
+    var name_user = req.user.name;
     var goal = req.body.goal;
     var date_goal = req.body.date_goal;
     var partner = req.body.partner;
     var email_partner = req.body.email_partner;
     const db = connection.getDbServiceInstance();
     
-    const result = db.insertNewGoal(email_user,goal,date_goal,partner,email_partner);
+    const result = db.insertNewGoal(email_user,name_user,goal,date_goal,partner,email_partner);
 
     result
     .catch(err => console.log(err));
 
     letterHTML = `
         <h4>Mes salutations, ${partner} !</h4>
-        <p>${req.user.name} a défini un objectif à atteindre : <b>${goal}</b>, à accomplir avant le <b>${date_goal}</b>.</p>
+        <p>${name_user} a défini un objectif à atteindre : <b>${goal}</b>, à accomplir avant le <b>${date_goal}</b>.</p>
         <p> Le choix s'est porté sur vous pour être cette aide qui lui rappelle continuellement de réussir le but fixé.</p>
         Cordialement,
         <h4>Papy Wakati</h4>
@@ -138,7 +145,6 @@ app.post('/goals', checkAuthenticated, (req, res) => {
 
 app.get('/friends', checkAuthenticated, (req, res) => {
     res.render('friends');
-    
 });
 
 app.get('/list/goals_where_partner', checkAuthenticated, (req, res) => {
@@ -207,9 +213,41 @@ app.get('/list/citations', checkAuthenticated, (req, res) => {
     .catch(err => console.log(err));
 });
 
+app.get('/messages/:id', checkAuthenticated, (req,res) => {
+    const { id } = req.params;
+    const db = connection.getDbServiceInstance();
+    const result = db.getMessages(id);
+    result
+    .then(data => res.json ({data : data}))
+    .catch(err => console.log(err));
+}
+
+);
+
+app.post('/messages/:id', checkAuthenticated, (req, res) => {
+    const {id} = req.params;
+    const dataUser = req.user.email;
+    const message = req.body.message;
+    const db = connection.getDbServiceInstance();
+    const result = db.sendMessage(id,dataUser,message);
+
+    result
+    .catch(err => console.log(err));
+
+    io.emit('message', req.body.message);
+
+    res.redirect('back');
+
+  });
+
 app.listen(port, () => {
     console.log(`listening at http://localhost:${port}`)
     });
 
+io.on('connection', (socket) => {
+    socket.on('chat message', msg => {
+    io.emit('chat message', msg);
+    });
+});
 
 module.exports = app;

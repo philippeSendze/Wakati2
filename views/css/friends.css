@@ -1,40 +1,80 @@
+:root{
+    --orange:#ff5733;
+    --yellow:#ffc300;
+    --red:#c70039;
+    --bordeau:#900c3e;
+    --purple:#571845;
+}
+
 body {
+    background-image: linear-gradient(to left, var(--orange),var(--yellow));
     display:flex;
     justify-content: space-between;
-    border: 3px solid black;
     height:750px;
     padding-top: 15px;
     margin-right: 100px;
     margin-left: 100px;
 }
 
+input {
+    margin-top:10px;
+    margin-right: 30px;
+    border: 3px solid var(--yellow);
+    background-color: var(--yellow);
+    color:var(--bordeau);
+    border-radius: 7px;
+    font-size: 12pt;
+    height:40px;
+    width:150px;
+
+}
+
+input:hover {
+    cursor:pointer;
+    background-color: var(--bordeau);
+    color:var(--yellow);
+}
+
+#section {
+    display: flex;
+    flex-direction: column;
+}
+
 #change_table {
-    border: 3px solid black;
     width:130px;
     height:150px;
     text-align: center;
-    margin-top:150px;
+    margin-top:50%;
 }
 
 #change_label {
     font-size:14pt;
+    font-style: italic;
+    font-weight: bold;
     height: 40px;
+    color:var(--purple);
+    
+
 }
 
 #change_button {
     border-radius:50%;
     width: 50px;
     height:50px;
-    background-color:cadetblue;
-    
+    background-color:var(--bordeau);
+    color:var(--bordeau); 
+    border: 3px solid var(--bordeau);
 }
 
 #change_button:hover{
     cursor: pointer;
+    background-color:var(--yellow);
+    color:var(--yellow);
+    border: 3px solid var(--yellow);
 }
 
 #friends_goals {
-    border: 3px solid black;
+    
     flex:0.35;
     /*margin-left: 50px;
     margin-right: 150px;
@@ -42,18 +82,26 @@ body {
 }
 
 #conversation {
-    border: 3px solid black;
+    border: 3px solid var(--yellow);
     flex:0.55;
+    width:500px;
+    display: flex;
+    flex-direction:column;
+    background-image:url('/images/3553853.gif');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 150px 150px;
+    background-color: var(--yellow);
     /*margin-right: 70px;*/
     
 }
 
-
-
 #conversation header {
     padding-left:20px;
     padding-bottom:10px;
-    background-color: brown;
+    
+    color:var(--purple);
+    flex:0.2;
 
 }
 
@@ -85,20 +133,16 @@ td {
     
 }
 
-.all {
-    text-align:center;
-}
 
 .title_goal {
+    text-align: center;
     cursor:pointer;
     text-align:center;
 }
 
-.title_my_goal {
-    cursor:pointer;
-    text-align:center;
+.title_goal:hover {
+    background-color:var(--orange);
 }
-
 
 h1 {
     text-align:center;
@@ -117,9 +161,62 @@ header {
     text-align:center;
 }
 
+#chat {
+    height:300px;
+    width:100%;
+    overflow-y:auto;
+    word-break: break-all;
+    flex:0.9;
+    display:flex;
+    flex-direction: column;
+    
+}
+
+.message {
+    border:3px solid var(--purple);
+    flex:0.2;
+    width:40%;
+    margin:10px 0px 10px 10px;
+    padding:10px;
+    border-radius:8px;
+    background-color:white;
+}
+
+#messageOther b {
+     color: var(--bordeau);
+     
+}
+
+#messageUser b {
+    color: var(--red);
+    
+}
+
+#messageUser {
+    align-self:flex-end;
+    margin-right:10px;
+    
+}
+
+#writeForm {
+    display:flex;
+    justify-content: space-between;
+}
+
+#writeMessage {
+    flex:0.89;
+}
+
 #submit_button {
-    border-radius:50%;
-    width: 50px;
-    height:50px;
-    background-color:cadetblue;
+    border-radius:49%; 
+    flex:0.1;
+    margin: 10px 10px;
+    cursor: pointer;
+    
+}
+
+.material-icons{
+    color:var(--yellow);
+    background-color: var(--purple);
+    border: 1px solid var(--purple);
 }

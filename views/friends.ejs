@@ -5,56 +5,66 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/friends.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
     <title>Objectifs d'amis</title>
 </head>
 <body>
-    <div id="friends_goals">
-        <table>
-            <thead>
-                <th>Partenariat dans les objectifs de tes amis</th>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
-    <div id="change_table">
-        <p id="change_label"> Voir tes objectifs</p>
-        <input type="button" id="change_button" value="o">
-    </div>
-    <div id="conversation">
-        <header>
-            <h1>Conversation</h1>
-            <b><i>Sujet: </i></b><span id="subject"></span>  
-            <span id="author_or_partner"><b><i>Auteur: </i></b><span id="author"></span></span>  
-            <b><i>Echéance: </i></b><span id="date_end"></span>
-        </header>
-        <div id="chat">
-
+        <div id="friends_goals">
+            <table>
+                <thead>
+                    <th>Partenariat dans les objectifs de tes amis</th>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
-        <div id="write">
-            <input type="text" id="type_message" placeholder="Ecrire un message">
-            <input type="button" id="submit_button">
+        <div id="section">
+            <input type="button" value="Accueil" onclick="location.href='/home'">
+            <input type="button" value="Se déconnecter" id="logout" onclick="location.href='/logout'">
+            <div id="change_table">
+                <p id="change_label"> Voir tes objectifs</p>
+                <input type="button" id="change_button" value="o">
+            </div>
         </div>
-    </div>
+        <div id="conversation">
+            <header>
+                <h1>Conversation</h1>
+                <b><i>Sujet: </i></b><span id="subject"></span>  
+                <b><i>Partenaire: </i></b><span id="partner"></span>  
+                <b><i>Echéance: </i></b><span id="date_end"></span>
+            </header>
+            <div id="chat"></div>
+            <div id="write"></div>
+        </div>
     
+
     <script>
+        const whoIsLogged = "";
+        var line = document.getElementsByClassName("title_goal");
+        var changeLabel = document.getElementById("change_label");
+        var titleTable = document.querySelector("#friends_goals table th");
+        var changeBtn = document.getElementById("change_button");
+        
+   
+        var write = document.getElementById("write");
+
         document.addEventListener("DOMContentLoaded", function () {
                 fetch('http://localhost:3000/list/goals_where_partner')
                 .then(response => response.json())
                 .then(data => loadTablePartner(data['data']));
             });
 
-        var line = document.getElementsByClassName("title_goal");
-        var lineMyGoal = document.getElementsByClassName("title_my_goal");
-        var changeLabel = document.getElementById("change_label");
-        var changeBtn = document.getElementById("change_button");
-        var titleTable = document.querySelector("#friends_goals table th");
-        
 
+        function getWhoIsLogged (data) {
+            return data.email;
+        }
+        
+        
         changeBtn.addEventListener("click", function () {
             switch(changeBtn.value) {
                 case "o":
                     titleTable.innerHTML= "Tes objectifs";
-                    changeLabel.innerHTML="Voir tes partenariats";
+                    changeLabel.innerHTML="Voir les objectifs de tes amis";
                     fetch('http://localhost:3000/list/goals_non_accomplished')
                         .then(response => response.json())
                         .then(data => loadTableNonAccomplished(data['data']));
@@ -80,23 +90,22 @@
                 
                 let tableHtml = "";
 
-                data.forEach(function ({id_goal, name_user,email_user,goal,date_goal}) {
+                data.forEach(function ({id_goal,name_user,email_user,goal,date_goal}) {
                     tableHtml += "<tr>";
-                    tableHtml += `<td>
-                                    <p class="title_my_goal" data-author="${name_user}" data-email-user="${email_user}" data-id="${id_goal}" data-goal="${goal}" data-date="${date_goal}">
+                    tableHtml += `<td class="title_goal" data-partner="${name_user}" data-email-user="${email_user}" data-id="${id_goal}" data-goal="${goal}" data-date="${date_goal}">
                                         ${goal}
-                                    </p>
                                 </td>`;
                     tableHtml += "</tr>";
                 });
-
+                
                 dataTable.innerHTML = tableHtml;
 
-                for(let i=0; i<lineMyGoal.length; i++) {
+                for(let i=0; i<line.length; i++) {
                 
-                lineMyGoal[i].addEventListener('click', function() {
-                    let value=lineMyGoal[i].dataset.id;
+                line[i].addEventListener('click', function() {
+                    let value=line[i].dataset.id;
                     infosConversationAsAnAuthor(value);
+                    showMessages(value);
                 });
                 
                 
@@ -115,10 +124,8 @@
 
             data.forEach(function ({id_goal, name_user,email_user,goal,date_goal}) {
                 tableHtml += "<tr>";
-                tableHtml += `<td>
-                                    <p class="title_goal" data-author="${name_user}" data-email-user="${email_user}" data-id="${id_goal}" data-goal="${goal}" data-date="${date_goal}">
+                tableHtml += `<td class="title_goal" data-author="${name_user}" data-email-user="${email_user}" data-id="${id_goal}" data-goal="${goal}" data-date="${date_goal}">
                                         ${goal}
-                                    </p>
                              </td>`;
                 tableHtml += "</tr>";
             });
@@ -130,6 +137,7 @@
                 line[i].addEventListener('click', function() {
                     let value=line[i].dataset.id;
                     infosConversationAsAPartner(value);
+                    showMessages(value);
                 });
                 
                 
@@ -139,6 +147,7 @@
         }
 
         function infosConversationAsAPartner(id) {
+            var email ="";
             fetch('http://localhost:3000/goals/'+id, {
                 method: 'GET'
             })
@@ -146,15 +155,24 @@
             .then(data => {
                 if (data.success) {
                 var subject = document.getElementById("subject");
-                var author = document.getElementById("author");
+                var partner = document.getElementById("partner");
                 var date = document.getElementById("date_end");
                 
-                subject.innerHTML=data.success[0].goal;
-                author.innerHTML=data.success[0].name_user +" ("+data.success[0].email_user+")";
-                date.innerHTML=new Date(data.success[0].date_goal).toLocaleDateString();
+                var goal = data.success[0].goal;
+                var user = data.success[0].name_user;
+                var email_user = data.success[0].email_user;
+                var date_goal = new Date(data.success[0].date_goal).toLocaleDateString();
+
+                subject.innerHTML = goal;
+                partner.innerHTML = user +" ("+email_user+")";
+                date.innerHTML=date_goal;
+                email=email_user;
             }
             });
+
+            
         }
+
 
         function infosConversationAsAnAuthor(id) {
             fetch('http://localhost:3000/goals/'+id, {
@@ -164,19 +182,74 @@
             .then(data => {
                 if (data.success) {
                 var subject = document.getElementById("subject");
-                var partner = document.getElementById("author_or_partner");
+                var partner = document.getElementById("partner");
                 var date = document.getElementById("date_end");
-                subject.innerHTML=data.success[0].goal;
-                partner.innerHTML="<b><i>Partenaire: </i></b><span id=\"partner\">"+data.success[0].partner +" ("+data.success[0].email_partner+")</span>";
-                date.innerHTML=new Date(data.success[0].date_goal).toLocaleDateString();
+                
+                var goal = data.success[0].goal;
+                var name_partner = data.success[0].partner;
+                var email_partner = data.success[0].email_partner;
+                var date_goal = new Date(data.success[0].date_goal).toLocaleDateString();
+
+                subject.innerHTML = goal;
+                partner.innerHTML = name_partner +" ("+email_partner+")";
+                date.innerHTML=date_goal;
+                email=email_user;
             }
             });
         }
 
+        function showMessages(id) {
+            write.innerHTML=` 
+                <form action="http://localhost:3000/messages/${id}" method="POST" id="writeForm">
+                    <textarea 
+                    id="writeMessage" name="message" placeholder="Ecrire un message" required></textarea>
+                    <input type="submit" id="submit_button" class="material-icons" value="send">
+                </form>
+            `;
 
+            fetch('http://localhost:3000/messages/'+id, {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data =>loadMessages(data['data']));
+        } 
+
+        function loadMessages(data1) {
+            const chat = document.getElementById("chat");
+            const message = document.getElementById("message");
+            var tableHtml = "";
+            fetch('http://localhost:3000/whoIsLogged')
+                .then(response => response.json())
+                .then(data2 => getWhoIsLogged(data2['data']))
+                .then(email => {
+                        
+                        data1.forEach(function ({user, message}) {
+                                tableHtml += "<tr>";
+                                if(email==user){
+                                    tableHtml += `<td>
+                                                    <div id="messageUser" class="message" data-person=${user}>
+                                                            <b>Moi:</b> ${message}
+                                                    </div>
+                                                </td>`;
+                                                            }    
+                                else {
+                                    tableHtml += `<td>
+                                                    <div id="messageOther" class="message" data-person=${user}>
+                                                        <b>${user}:</b>  ${message}
+                                                    </div>  
+                                                </td>`;
+                                    tableHtml += "</tr>";
+                                            }
+                        
+                                });
+                        chat.innerHTML = tableHtml;
+                    });
+            
+                }
+
+        
 
     </script>
-
 </body>
 
 </html>
