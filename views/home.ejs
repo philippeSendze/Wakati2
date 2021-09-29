@@ -30,8 +30,8 @@
                     </div>
                 </div>
                 <div id="button_section">
-                    <input type="button" onclick="location.href='/goals'" id = "add" class="button_board" value="Ajouter un objectif">
-                    <input type="button" onclick="location.href='/friends'" class="button_board" value="Objectifs d'amis">
+                    <input type="button" onclick="location.href='/goals'" id="add" class="button_board" value="Ajouter un objectif">
+                    <input type="button" onclick="location.href='/friends'" class="button_board" value="Détails des objectifs et discussion">
                 </div>
             </div>
             <div id="papy_section">
@@ -61,6 +61,14 @@
             var deleteBtn = document.getElementsByClassName("delete");
             var accomplishedBtn = document.getElementsByClassName("accomplished");
             var details = document.getElementsByClassName("details");
+            var restoreBtn = document.getElementsByClassName("restore");
+            const table_goals_non_accomplished = document.getElementById("goals");
+            const table_goals_accomplished = document.getElementById("finished_goals");
+            const addBtn = document.getElementById("add");
+            const dialog = document.getElementById("dialog");
+            const papy = document.querySelector("#iconPapy img");
+            const logout = document.getElementById("logout");
+
 
 
             function loadTableNonAccomplished(data) {
@@ -75,14 +83,12 @@
                 data.forEach(function ({id_goal, goal}) {
                     tableHtml += "<tr>";
                     tableHtml += `<td>
-                                    <div class="all">
                                         <p class="title_goal">${goal}</p>
                                         <div class="blocks">
                                             <input class="details" type="button" data-id=${id_goal} value="Détails">
                                             <input class="delete" type="button" data-id=${id_goal} value="Abandonner">
                                             <input class="accomplished" type="button" data-id=${id_goal} value="Accompli">
                                         </div>
-                                    </div>
                                 </td>`;
                     tableHtml += "</tr>";
                 });
@@ -120,13 +126,12 @@
                 data.forEach(function ({id_goal,goal}) {
                     tableHtml += "<tr>";
                     tableHtml += `<td>
-                                    <div class="all">
                                         <p class="title_goal">${goal}</p>
                                         <div class="blocks">
                                             <input class="details" type="button" data-id=${id_goal} value="Détails">
-                                            <input class="delete" type="button" data-id=${id_goal} value="Supprimer">
+                                            <input class="restore" type="button" data-id=${id_goal} value="Restaurer">
+                                            <input class="delete" type="button" data-id=${id_goal} value="Effacer">
                                         </div>
-                                    </div>
                                 </td>`;
                     tableHtml += "</tr>";
                 });
@@ -135,10 +140,19 @@
 
                 for(let i=0; i<deleteBtn.length; i++){
                     deleteBtn[i].addEventListener('click', function () {
+                        var result = confirm("Êtes-vous sûrs de définitivement supprimer cet objectif?");
+                        if(result) {
                         let value=deleteBtn[i].dataset.id;
-                        deleteById(value);
+                        deleteById(value);}
                         
                 });} 
+
+                for(let i=0; i<restoreBtn.length; i++){
+                    restoreBtn[i].addEventListener('click', function () {
+                        let value=restoreBtn[i].dataset.id;
+                        deleteAccomplished(value);
+                        
+                });}
 
                 for(let i=0; i<details.length; i++){
                     details[i].addEventListener('click', function () {
@@ -174,6 +188,19 @@
                 }); 
             }
 
+            function deleteAccomplished(id) {
+                fetch('http://localhost:3000/update/non_accomplished/' + id, {
+                    method: 'PATCH'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                }); 
+            }
+
+
             function getOneGoal (id) {
                 fetch('http://localhost:3000/goals/' + id, {
                     method: 'GET'
@@ -181,25 +208,16 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert(`
-                            Objectif : ${data.success[0].goal} ;
-                            Date d'échéance : ${new Date(data.success[0].date_goal).toLocaleDateString()} ;
-                            Partenaire : ${data.success[0].partner} ;
-                            Son email : ${data.success[0].email_partner}.
-                            `);
+                    dialog.innerHTML = `
+                            <p><b> Voici les détails de l'objectif sélectionné : </b><p>
+                            <p> <b>Objectif :</b> ${data.success[0].goal} ; </p>
+                            <p> <b>Date d'échéance :</b> ${new Date(data.success[0].date_goal).toLocaleDateString()} ;</p>
+                            <p> <b>Partenaire :</b> ${data.success[0].partner} ;</p>
+                            <p> <b>Son email :</b> ${data.success[0].email_partner}.</p>
+                            `;
                     }
                 });
             }
-
-
-            const table_goals_non_accomplished = document.getElementById("goals");
-            const table_goals_accomplished = document.getElementById("finished_goals");
-            const addBtn = document.getElementById("add");
-            const dialog = document.getElementById("dialog");
-            const papy = document.querySelector("#iconPapy img");
-            const logout = document.getElementById("logout");
-
-
 
             addBtn.addEventListener("mouseover", function () {
                 dialog.innerHTML=`<p>Grâce à ce bouton, tu peux enregistrer un <span>objectif</span>, son <span>échéance</span> et une <span>connaissance</span> à toi qui te rappellera continuellement de le réussir.</p>`;

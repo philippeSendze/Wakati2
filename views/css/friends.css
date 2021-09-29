@@ -122,7 +122,6 @@ th {
     background-color: var(--bordeau);
     color: var(--yellow);
     border: 3px solid var(--bordeau);
-    cursor:help;
     font-size: 14pt;
 }
 

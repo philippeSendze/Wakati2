@@ -44,8 +44,8 @@ function checkAuthenticated(req, res, next){
 var transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: '',
-    pass: ''
+    user: 'sendze.philippe@gmail.com',
+    pass: 'Colossiens317'
   }
 });
 
@@ -120,6 +120,8 @@ app.post('/goals', checkAuthenticated, (req, res) => {
         <h4>Mes salutations, ${partner} !</h4>
         <p>${name_user} a défini un objectif à atteindre : <b>${goal}</b>, à accomplir avant le <b>${date_goal}</b>.</p>
         <p> Le choix s'est porté sur vous pour être cette aide qui lui rappelle continuellement de réussir le but fixé.</p>
+        <p> Si vous êtes déjà inscrit sur notre plateforme, vous trouverez son objectif dans la section "Détails des objectifs et chat" de votre page.
+        Sinon, nous vous y accueillerons avec plaisir pour vous offrir un bon environnement d'aide et pour que vous puissiez à votre tour inscrire vos objectifs !</p>
         Cordialement,
         <h4>Papy Wakati</h4>
     `;
@@ -199,6 +201,16 @@ app.patch('/update/accomplished/:id', checkAuthenticated, (req, res) => {
     const { id } = req.params;
     const db = connection.getDbServiceInstance();
     const result = db.updateAccomplishment(id);
+    result
+    .then(data => res.json({success : data}))
+    .catch(err => console.log(err));
+
+});
+
+app.patch('/update/non_accomplished/:id', checkAuthenticated, (req, res) => {
+    const { id } = req.params;
+    const db = connection.getDbServiceInstance();
+    const result = db.deleteAccomplishment(id);
     result
     .then(data => res.json({success : data}))
     .catch(err => console.log(err));

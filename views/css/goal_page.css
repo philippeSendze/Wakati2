@@ -8,19 +8,52 @@
 
 body {
     background-image: linear-gradient(to left, var(--orange),var(--yellow));
-    display:flex;
-    justify-content: center;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    display: flex;
+    justify-content: flex-end;
+}
+
+header input {
+    margin-top:10px;
+    margin-right: 30px;
+    border: 3px solid var(--yellow);
+    background-color: var(--yellow);
+    color:var(--bordeau);
+    border-radius: 7px;
+    font-size: 12pt;
+    height:40px;
+    width:150px;
+
+}
+
+header input:hover{
+    cursor:pointer;
+    background-color: var(--bordeau);
+    color:var(--yellow);
 }
 
 section {
+    display:flex;
+    justify-content: center;
     width:1200px;
     height:600px;
     line-height:2.5;
     font-size: 21pt;
 }
 
-input {
+label {
+    border:3px solid var(--purple);
+    color:var(--yellow);
+    background-color: var(--purple);
+    border-style: double;
+    border-radius: 8px;
+}
+
+form input {
     height:45px;
     width:40%;
     border-radius:8px;

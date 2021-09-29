@@ -38,7 +38,7 @@ class Connect {
     async getAccomplishedGoals(email_user) {
     try {
         const response = await new Promise((resolve, reject) => {
-            const query = "SELECT id_goal, goal FROM goals where accomplished=1 AND email_user=?;";
+            const query = "SELECT * FROM goals where accomplished=1 AND email_user=?;";
 
             connection.query(query, email_user, (err, results) => {
                 if (err) reject(new Error(err.message));
@@ -105,6 +105,24 @@ class Connect {
         }
         }
 
+        async deleteAccomplishment(id){
+            try {
+            id = parseInt(id,10);
+                const response = await new Promise((resolve, reject) => {
+                    const query = "UPDATE goals SET accomplished = 0 WHERE id_goal = ?";
+                    connection.query(query, id, (err, result) => {
+                        if (err) reject(new Error(err.message));
+                        resolve(result);
+                    });
+                });
+        
+                return response;
+            } catch (error) {
+                console.log(error);
+                return false;
+            }
+            }
+
     async insertNewGoal(email_user, name_user, goal,date_goal,partner,email_partner) {
         try {
             const insertId = await new Promise((resolve, reject) => {
@@ -127,6 +145,7 @@ class Connect {
             console.log(error);
         }
     }
+    
 
    async getCitations() {
         try {

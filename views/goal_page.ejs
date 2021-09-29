@@ -5,6 +5,10 @@
         <title>Enregistrer un objectif</title>
     </head>
     <body>
+        <header>
+            <input type="button" value="Accueil" onclick="location.href='/home'">
+            <input type="button" value="Se déconnecter" id="logout" onclick="location.href='/logout'">
+        </header>
         <section>
             <form id="save_goal" action="http://localhost:3000/goals" method="POST">
                 <label for="goal">Objectif :</label>

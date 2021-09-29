@@ -73,10 +73,6 @@ table{
     
 }
 
-th, td {
-    padding-left:20px;
-}
-
 
 th {
     background-color: var(--bordeau);
@@ -89,30 +85,25 @@ th {
 td {
     background-color: white;
     border: 3px solid var(--purple);
-
+    padding: 0 10px 0 10px;
     
 }
 
-.all {
-    display:flex;
-}
 
 .title_goal {
-    flex:0.5;
     width:100%;
     height:100%;
     overflow: hidden;
     text-overflow: ellipsis;
     font-size:20pt;
+    text-align: center;
 }
 
 .blocks {
-    flex:0.5;
-    text-align:left;
-}
+    display:flex;
+    justify-content: space-between;
 
-#finished_goals .blocks {
-    flex:0.3;
+
 }
 
 td input:hover {
@@ -133,7 +124,6 @@ th span{
 }
 
  td input {
-    margin-left:70%;
     visibility: hidden;
     background-color: var(--purple);
     color:var(--yellow);
@@ -169,10 +159,8 @@ th span{
 }
 
 #finished_goals td input{
-    margin-left:30%;
+    
 }
-
-
 
 #papy_section{
     flex:0.25;
@@ -233,7 +221,7 @@ header{
 }
 
 .button_board {
-    width:150px;
+    width:100%;
     height: 50px;
     border-radius:8px;
     background-color: var(--bordeau);
@@ -243,8 +231,7 @@ header{
     text-align: center;
     padding: 5px;
     padding-top:9px;
-    font-size:12pt;
-
+    font-size:14pt;
 }
 
 .button_board:hover{
@@ -252,6 +239,7 @@ header{
     background-color: var(--yellow);
     color:var(--bordeau);
 }
+
 a{
     width:150px; 
     text-decoration: none;
