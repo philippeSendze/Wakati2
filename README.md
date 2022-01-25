@@ -1,0 +1,1 @@
+# Wakati est une plateforme web sur laquelle un utilisateur peut partager ses objectifs à long ou court terme avec un partenaire qui suivra son accomplissement. L'utilisateur peut aussi y retrouver des citations inspirantes sur la gestion du temps.
